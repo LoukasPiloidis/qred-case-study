@@ -11,9 +11,10 @@
 		"db:stop": "docker compose down",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
+		"db:seed": "npx tsx src/lib/db/seed.ts",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"lint": "biome check .",
+		"lint": "tsc && biome check .",
 		"lint:fix": "biome check --write ."
 	},
 	"engines": {

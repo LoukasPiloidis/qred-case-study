@@ -1,20 +1,42 @@
 import fastify from "fastify";
+import {
+	serializerCompiler,
+	validatorCompiler,
+} from "fastify-type-provider-zod";
+import type { Database } from "./lib/db/client.js";
 import { errorHandler } from "./lib/errors/error-handler.js";
 import { loggerConfig } from "./lib/logger/index.js";
+import { registerAuth } from "./plugins/auth.js";
+import { registerDatabase } from "./plugins/database.js";
 import { registerRequestContext } from "./plugins/request-context.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { registerHealthRoute } from "./routes/health.js";
+import { registerInvoiceRoutes } from "./routes/invoice.routes.js";
+import { registerUserRoutes } from "./routes/user.routes.js";
 
-export const createApp = async () => {
+type CreateAppOptions = {
+	db: Database;
+};
+
+export const createApp = async ({ db }: CreateAppOptions) => {
 	const app = fastify({
 		logger: loggerConfig,
 	});
 
+	app.setValidatorCompiler(validatorCompiler);
+	app.setSerializerCompiler(serializerCompiler);
 	app.setErrorHandler(errorHandler);
 
+	await registerDatabase(app, db);
 	await registerSwagger(app);
 	await registerRequestContext(app);
 	await registerHealthRoute(app);
+
+	await app.register(async (protectedRoutes) => {
+		await registerAuth(protectedRoutes);
+		await registerUserRoutes(protectedRoutes);
+		await registerInvoiceRoutes(protectedRoutes);
+	});
 
 	return app;
 };

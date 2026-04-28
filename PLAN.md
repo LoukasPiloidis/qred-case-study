@@ -55,29 +55,30 @@ src/
 
 **Commit**: `feat: add users and invoices with schema, services, and tests`
 
-**Endpoints**: `GET /api/users/:userId`, `GET /api/users/:userId/invoices`
+**Endpoints**: `GET /api/self`, `GET /api/self/invoices`
 
 **Schema**:
 - `users`: id (uuid), companyName, email, createdAt
 - `invoices`: id (uuid), userId (FK), amount (integer/oere), dueDate, status (enum: pending/paid/overdue), createdAt
 
-**Module structure** (repeated pattern for all slices):
+**Structure** (flat layout by layer):
 ```
-src/modules/users/
-  user.routes.ts, user.controller.ts, user.service.ts
-  user.serializer.ts, user.errors.ts (3XXX)
-  user.controller.test.ts, user.service.test.ts, user.serializer.test.ts
-src/modules/invoices/
-  invoice.routes.ts, invoice.controller.ts, invoice.service.ts
-  invoice.serializer.ts, invoice.errors.ts (4XXX)
-  invoice.controller.test.ts, invoice.service.test.ts, invoice.serializer.test.ts
+src/routes/user.routes.ts, invoice.routes.ts
+src/controllers/user.controller.ts, invoice.controller.ts
+src/services/user.service.ts, invoice.service.ts
+src/serializers/user.serializer.ts, invoice.serializer.ts
+src/lib/errors/errors.ts          # single file, all domain errors (UserErrors 3XXX, InvoiceErrors 4XXX)
 ```
 
 **Key details**:
+- Auth via `x-user-id` header (simulates JWT/cookie) — userId derived from auth context, not URL params
+- Protected routes scoped under a Fastify register block with auth hook
 - Invoice service computes `hasDueInvoice` (for FE notification badge)
-- Zod params validation: `{ userId: z.string().uuid() }`
 - `fastify-type-provider-zod` for auto OpenAPI generation
-- Error codes: USER_NOT_FOUND=3001, INVOICES_NOT_FOUND=4001
+- Frozen plain objects group domain errors (e.g. `UserErrors.NOT_FOUND`) in a single `errors.ts` file
+- Shared `useTestDb()` helper handles all test lifecycle (beforeAll/afterEach/afterAll)
+- Invoice service trusts auth — no redundant user existence check
+- Error codes: USER_NOT_FOUND=3001, UNAUTHORIZED=3002
 
 ---
 
@@ -85,7 +86,7 @@ src/modules/invoices/
 
 **Commit**: `feat: add cards endpoints with spending limit tracking`
 
-**Endpoints**: `GET /api/cards/:cardId`, `PATCH /api/cards/:cardId/activate`
+**Endpoints**: `GET /api/self/card`, `PATCH /api/self/card/activate`
 
 **Schema**:
 - `cards`: id (uuid), userId (FK), lastFourDigits (varchar 4), status (enum: inactive/active/blocked), spendingLimit (integer/oere), currentSpend (integer/oere), expiryDate, createdAt
@@ -102,7 +103,7 @@ src/modules/invoices/
 
 **Commit**: `feat: add paginated transactions endpoint`
 
-**Endpoint**: `GET /api/cards/:cardId/transactions?limit=3&cursor=xxx`
+**Endpoint**: `GET /api/self/card/transactions?limit=3&cursor=xxx`
 
 **Schema**:
 - `transactions`: id (uuid), cardId (FK), description, amount (integer/oere), currency (default SEK), date, category, createdAt
@@ -120,7 +121,7 @@ src/modules/invoices/
 
 **Commit**: `feat: add dashboard aggregate endpoint for home screen`
 
-**Endpoint**: `GET /api/users/:userId/dashboard`
+**Endpoint**: `GET /api/self/dashboard`
 
 **Response** (maps 1:1 to FE mockup):
 ```json

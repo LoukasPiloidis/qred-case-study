@@ -11,12 +11,13 @@
 		"db:stop": "docker compose down",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
-		"db:seed": "npx tsx src/lib/db/seed.ts",
+		"db:seed": "tsx src/lib/db/seed.ts",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"lint": "tsc && biome check .",
 		"lint:fix": "biome check --write ."
 	},
+	"packageManager": "pnpm@10.33.0",
 	"engines": {
 		"node": ">=25"
 	},
@@ -41,5 +42,10 @@
 		"tsx": "^4.21.0",
 		"typescript": "^6.0.3",
 		"vitest": "^4.1.5"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild"
+		]
 	}
 }

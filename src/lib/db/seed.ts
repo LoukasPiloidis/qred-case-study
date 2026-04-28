@@ -4,12 +4,12 @@ import { cards, invoices, transactions, users } from "./schema/index.js";
 
 const USER_ID = "cac45c3f-be23-429e-8ccf-3f3f4d45521a";
 
-await db.delete(users);
-await db.delete(transactions);
-await db.delete(cards);
-await db.delete(invoices);
-
 async function seed() {
+	await db.delete(users);
+	await db.delete(transactions);
+	await db.delete(cards);
+	await db.delete(invoices);
+
 	await db
 		.insert(users)
 		.values({

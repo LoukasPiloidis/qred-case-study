@@ -18,7 +18,7 @@
 		"lint:fix": "biome check --write ."
 	},
 	"engines": {
-		"node": ">=22"
+		"node": ">=25"
 	},
 	"dependencies": {
 		"@fastify/cors": "^11.2.0",

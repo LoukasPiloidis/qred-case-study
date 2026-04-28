@@ -2,8 +2,11 @@ CREATE TABLE "transactions" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
 	"card_id" uuid NOT NULL,
+	"description" varchar(255) NOT NULL,
 	"amount" integer NOT NULL,
-	"merchant" varchar(255) NOT NULL,
+	"currency" varchar(3) DEFAULT 'SEK' NOT NULL,
+	"date" timestamp NOT NULL,
+	"category" varchar(100) NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint

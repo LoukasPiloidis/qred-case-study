@@ -8,8 +8,11 @@ const makeTransaction = (overrides = {}) => ({
 	id: "550e8400-e29b-41d4-a716-446655440000",
 	userId: "660e8400-e29b-41d4-a716-446655440000",
 	cardId: "770e8400-e29b-41d4-a716-446655440000",
+	description: "Office Supplies AB",
 	amount: 15000,
-	merchant: "Office Supplies AB",
+	currency: "SEK",
+	date: new Date("2026-04-25T10:30:00.000Z"),
+	category: "supplies",
 	createdAt: new Date("2026-04-25T10:30:00.000Z"),
 	...overrides,
 });
@@ -21,9 +24,12 @@ describe("toTransactionResponse", () => {
 		expect(result).toEqual({
 			id: "550e8400-e29b-41d4-a716-446655440000",
 			cardId: "770e8400-e29b-41d4-a716-446655440000",
+			description: "Office Supplies AB",
 			amount: 15000,
 			formattedAmount: "150 kr",
-			merchant: "Office Supplies AB",
+			currency: "SEK",
+			date: "2026-04-25T10:30:00.000Z",
+			category: "supplies",
 			createdAt: "2026-04-25T10:30:00.000Z",
 		});
 	});
@@ -48,18 +54,23 @@ describe("toTransactionResponse", () => {
 });
 
 describe("toTransactionsResponse", () => {
-	it("wraps transactions with totalCount", () => {
-		const rows = [makeTransaction(), makeTransaction({ id: "aaa" })];
-		const result = toTransactionsResponse(rows);
+	it("wraps transactions with remainingCount and nextCursor", () => {
+		const rows = [
+			makeTransaction(),
+			makeTransaction({ id: "aaa", date: new Date("2026-04-20T10:00:00Z") }),
+		];
+		const result = toTransactionsResponse(rows, 5);
 
 		expect(result.transactions).toHaveLength(2);
-		expect(result.totalCount).toBe(2);
+		expect(result.remainingCount).toBe(5);
+		expect(result.nextCursor).toBeTypeOf("string");
 	});
 
-	it("returns empty array with zero count", () => {
-		const result = toTransactionsResponse([]);
+	it("returns empty array with zero count and null cursor", () => {
+		const result = toTransactionsResponse([], 0);
 
 		expect(result.transactions).toHaveLength(0);
-		expect(result.totalCount).toBe(0);
+		expect(result.remainingCount).toBe(0);
+		expect(result.nextCursor).toBeNull();
 	});
 });

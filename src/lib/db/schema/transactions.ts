@@ -16,7 +16,10 @@ export const transactions = pgTable("transactions", {
 	cardId: uuid("card_id")
 		.notNull()
 		.references(() => cards.id),
+	description: varchar("description", { length: 255 }).notNull(),
 	amount: integer("amount").notNull(),
-	merchant: varchar("merchant", { length: 255 }).notNull(),
+	currency: varchar("currency", { length: 3 }).notNull().default("SEK"),
+	date: timestamp("date").notNull(),
+	category: varchar("category", { length: 100 }).notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -28,6 +28,6 @@ export const CardErrors = Object.freeze({
 	BLOCKED: Object.freeze(new AppError(403, "Card is blocked", 1004)),
 });
 
-export const TransactionErrors = Object.freeze({
-	NOT_FOUND: Object.freeze(new AppError(404, "No transactions found", 2001)),
+export const CursorErrors = Object.freeze({
+	INVALID_CURSOR: Object.freeze(new AppError(400, "Invalid cursor", 2001)),
 });

@@ -174,15 +174,34 @@
           "primaryKey": false,
           "notNull": true
         },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "amount": {
           "name": "amount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "merchant": {
-          "name": "merchant",
-          "type": "varchar(255)",
+        "currency": {
+          "name": "currency",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'SEK'"
+        },
+        "date": {
+          "name": "date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },

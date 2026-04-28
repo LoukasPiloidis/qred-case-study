@@ -39,16 +39,22 @@ describe("GET /api/self/invoices", () => {
 		await app.close();
 	});
 
-	it("returns 404 when user does not exist", async () => {
-		const app = await createTestApp(getDb());
+	it("returns 200 with empty invoices when user has none", async () => {
+		const db = getDb();
+		const [user] = await db
+			.insert(users)
+			.values({ companyName: "Company AB", email: "info@company-ab.se" })
+			.returning();
+
+		const app = await createTestApp(db);
 		const response = await app.inject({
 			method: "GET",
 			url: "/api/self/invoices",
-			headers: { "x-user-id": "550e8400-e29b-41d4-a716-446655440000" },
+			headers: { "x-user-id": user.id },
 		});
 
-		expect(response.statusCode).toBe(404);
-		expect(response.json().errorCode).toBe(4001);
+		expect(response.statusCode).toBe(200);
+		expect(response.json().invoices).toHaveLength(0);
 
 		await app.close();
 	});

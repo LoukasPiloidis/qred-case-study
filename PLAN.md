@@ -61,16 +61,13 @@ src/
 - `users`: id (uuid), companyName, email, createdAt
 - `invoices`: id (uuid), userId (FK), amount (integer/oere), dueDate, status (enum: pending/paid/overdue), createdAt
 
-**Module structure** (repeated pattern for all slices):
+**Structure** (flat layout by layer):
 ```
-src/modules/users/
-  user.routes.ts, user.controller.ts, user.service.ts
-  user.serializer.ts, user.errors.ts (3XXX)
-  user.controller.test.ts, user.service.test.ts, user.serializer.test.ts
-src/modules/invoices/
-  invoice.routes.ts, invoice.controller.ts, invoice.service.ts
-  invoice.serializer.ts, invoice.errors.ts (4XXX)
-  invoice.controller.test.ts, invoice.service.test.ts, invoice.serializer.test.ts
+src/routes/user.routes.ts, invoice.routes.ts
+src/controllers/user.controller.ts, invoice.controller.ts
+src/services/user.service.ts, invoice.service.ts
+src/serializers/user.serializer.ts, invoice.serializer.ts
+src/lib/errors/errors.ts          # single file, all domain errors (UserErrors 3XXX, InvoiceErrors 4XXX)
 ```
 
 **Key details**:
@@ -78,9 +75,10 @@ src/modules/invoices/
 - Protected routes scoped under a Fastify register block with auth hook
 - Invoice service computes `hasDueInvoice` (for FE notification badge)
 - `fastify-type-provider-zod` for auto OpenAPI generation
-- Error classes group domain errors as static instances (e.g. `UserErrors.NOT_FOUND`)
+- Frozen plain objects group domain errors (e.g. `UserErrors.NOT_FOUND`) in a single `errors.ts` file
 - Shared `useTestDb()` helper handles all test lifecycle (beforeAll/afterEach/afterAll)
-- Error codes: USER_NOT_FOUND=3001, INVOICES_USER_NOT_FOUND=4001
+- Invoice service trusts auth — no redundant user existence check
+- Error codes: USER_NOT_FOUND=3001, UNAUTHORIZED=3002
 
 ---
 

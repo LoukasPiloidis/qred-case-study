@@ -10,11 +10,11 @@ export class AppError extends Error {
 	}
 }
 
-export const UserErrors = {
-	NOT_FOUND: new AppError(404, "User not found", 3001),
-	UNAUTORIZED: new AppError(401, "Unauthorized", 3002),
-} as const;
+export const UserErrors = Object.freeze({
+	NOT_FOUND: Object.freeze(new AppError(404, "User not found", 3001)),
+	UNAUTHORIZED: Object.freeze(new AppError(401, "Unauthorized", 3002)),
+});
 
-export const InvoiceErrors = {
-	USER_NOT_FOUND: new AppError(404, "User not found", 4001),
-} as const;
+export const InvoiceErrors = Object.freeze({
+	USER_NOT_FOUND: Object.freeze(new AppError(404, "User not found", 4001)),
+});

@@ -16,7 +16,7 @@ export const registerAuth = async (app: FastifyInstance) => {
 		const userId = request.headers["x-user-id"];
 
 		if (typeof userId !== "string" || !userId) {
-			throw UserErrors.UNAUTORIZED;
+			throw UserErrors.UNAUTHORIZED;
 		}
 
 		request.userId = userId;

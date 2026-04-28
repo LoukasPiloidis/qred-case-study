@@ -75,12 +75,12 @@ describe("getInvoicesByUserId", () => {
 		expect(result.dueInvoiceCount).toBe(2);
 	});
 
-	it("throws AppError 404 when user does not exist", async () => {
+	it("returns empty array when user ID has no invoices", async () => {
 		const fakeId = "550e8400-e29b-41d4-a716-446655440000";
 
-		await expect(getInvoicesByUserId(getDb(), fakeId)).rejects.toMatchObject({
-			statusCode: 404,
-			errorCode: 4001,
-		});
+		const result = await getInvoicesByUserId(getDb(), fakeId);
+
+		expect(result.invoices).toHaveLength(0);
+		expect(result.hasDueInvoice).toBe(false);
 	});
 });

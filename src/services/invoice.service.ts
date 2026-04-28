@@ -1,16 +1,8 @@
 import { eq } from "drizzle-orm";
 import type { Database } from "../lib/db/client.js";
 import { invoices } from "../lib/db/schema/invoices.js";
-import { users } from "../lib/db/schema/users.js";
-import { InvoiceErrors } from "../lib/errors/errors.js";
 
 export const getInvoicesByUserId = async (db: Database, userId: string) => {
-	const [user] = await db.select().from(users).where(eq(users.id, userId));
-
-	if (!user) {
-		throw InvoiceErrors.USER_NOT_FOUND;
-	}
-
 	const userInvoices = await db
 		.select()
 		.from(invoices)

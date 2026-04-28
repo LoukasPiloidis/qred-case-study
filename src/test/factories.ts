@@ -94,9 +94,7 @@ export const createInvoice = async (
 	{
 		userId,
 		...overrides
-	}: { userId: string } & Partial<
-		Omit<typeof invoices.$inferInsert, "userId">
-	>,
+	}: { userId: string } & Partial<Omit<typeof invoices.$inferInsert, "userId">>,
 ) => {
 	const [invoice] = await db
 		.insert(invoices)

@@ -4,7 +4,7 @@ import type { invoices } from "../lib/db/schema/invoices.js";
 type InvoiceRow = typeof invoices.$inferSelect;
 
 const invoiceResponseSchema = z.object({
-	id: z.string().uuid(),
+	id: z.uuid(),
 	amount: z.number().int(),
 	dueDate: z.iso.datetime(),
 	status: z.enum(["pending", "paid", "overdue"]),

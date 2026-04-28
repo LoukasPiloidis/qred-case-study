@@ -27,6 +27,12 @@ export const registerCardRoutes = async (app: FastifyInstance) => {
 	app.patch(
 		"/api/self/card/activate",
 		{
+			config: {
+				rateLimit: {
+					max: 10,
+					timeWindow: "1 minute",
+				},
+			},
 			schema: {
 				tags: ["Cards"],
 				summary: "Activate the authenticated user's card",

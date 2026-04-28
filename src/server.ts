@@ -9,6 +9,7 @@ import { loggerConfig } from "./lib/logger/index.js";
 import { registerAuth } from "./plugins/auth.js";
 import { registerCors } from "./plugins/cors.js";
 import { registerDatabase } from "./plugins/database.js";
+import { registerRateLimit } from "./plugins/rate-limit.js";
 import { registerRequestContext } from "./plugins/request-context.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { registerCardRoutes } from "./routes/card.routes.js";
@@ -32,6 +33,7 @@ export const createApp = async ({ db }: CreateAppOptions) => {
 	app.setErrorHandler(errorHandler);
 
 	await registerCors(app);
+	await registerRateLimit(app);
 	await registerDatabase(app, db);
 	await registerSwagger(app);
 	await registerRequestContext(app);

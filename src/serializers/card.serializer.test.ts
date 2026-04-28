@@ -1,24 +1,13 @@
 import { describe, expect, it } from "vitest";
+import { makeCard } from "../test/factories.js";
 import { toCardResponse } from "./card.serializer.js";
-
-const makeCard = (overrides = {}) => ({
-	id: "550e8400-e29b-41d4-a716-446655440000",
-	userId: "660e8400-e29b-41d4-a716-446655440000",
-	lastFourDigits: "4567",
-	status: "active" as const,
-	spendingLimit: 1000000,
-	currentSpend: 540000,
-	expiryDate: new Date("2027-12-31T00:00:00.000Z"),
-	createdAt: new Date("2025-01-01T00:00:00.000Z"),
-	...overrides,
-});
 
 describe("toCardResponse", () => {
 	it("transforms a card row to the API response shape", () => {
 		const result = toCardResponse(makeCard());
 
 		expect(result).toEqual({
-			id: "550e8400-e29b-41d4-a716-446655440000",
+			id: "660e8400-e29b-41d4-a716-446655440000",
 			lastFourDigits: "4567",
 			status: "active",
 			remainingSpend: {

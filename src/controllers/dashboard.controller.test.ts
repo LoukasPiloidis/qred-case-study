@@ -1,57 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { cards } from "../lib/db/schema/cards.js";
-import { invoices } from "../lib/db/schema/invoices.js";
-import { transactions } from "../lib/db/schema/transactions.js";
-import { users } from "../lib/db/schema/users.js";
+import {
+	createCard,
+	createInvoice,
+	createTransaction,
+	createUser,
+} from "../test/factories.js";
 import { createTestApp } from "../test/helpers.js";
 import { useTestDb } from "../test/setup.js";
 
 describe("GET /api/self/dashboard", () => {
 	const getDb = useTestDb();
 
-	const seedFullUser = async () => {
+	it("returns 200 with full dashboard data", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
-
-		const [card] = await db
-			.insert(cards)
-			.values({
-				userId: user.id,
-				lastFourDigits: "4567",
-				spendingLimit: 1000000,
-				currentSpend: 540000,
-				expiryDate: new Date("2027-12-31"),
-				status: "active",
-			})
-			.returning();
-
-		await db.insert(invoices).values({
+		const user = await createUser(db);
+		const card = await createCard(db, {
 			userId: user.id,
-			amount: 150000,
-			dueDate: new Date("2025-06-01"),
-			status: "pending",
+			lastFourDigits: "4567",
+			currentSpend: 540000,
+			status: "active",
 		});
 
-		await db.insert(transactions).values({
+		await createInvoice(db, { userId: user.id });
+		await createTransaction(db, {
 			userId: user.id,
 			cardId: card.id,
 			description: "Coffee shop",
 			amount: -4500,
-			currency: "SEK",
-			date: new Date("2025-06-10"),
 			category: "food",
+			date: new Date("2025-06-10"),
 		});
 
-		return user;
-	};
-
-	it("returns 200 with full dashboard data", async () => {
-		const user = await seedFullUser();
-
-		const app = await createTestApp(getDb());
+		const app = await createTestApp(db);
 		const response = await app.inject({
 			method: "GET",
 			url: "/api/self/dashboard",
@@ -85,10 +65,7 @@ describe("GET /api/self/dashboard", () => {
 
 	it("returns 404 when user has no card", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
+		const user = await createUser(db);
 
 		const app = await createTestApp(db);
 		const response = await app.inject({

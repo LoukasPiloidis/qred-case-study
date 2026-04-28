@@ -2,9 +2,14 @@ import { eq } from "drizzle-orm";
 import { db } from "./client.js";
 import { cards, invoices, transactions, users } from "./schema/index.js";
 
-const USER_ID = "00000000-0000-0000-0000-000000000001";
+const USER_ID = "cac45c3f-be23-429e-8ccf-3f3f4d45521a";
 
 async function seed() {
+	await db.delete(users);
+	await db.delete(transactions);
+	await db.delete(cards);
+	await db.delete(invoices);
+
 	await db
 		.insert(users)
 		.values({
@@ -13,10 +18,6 @@ async function seed() {
 			email: "test@acme.com",
 		})
 		.onConflictDoNothing();
-
-	await db.delete(transactions);
-	await db.delete(cards);
-	await db.delete(invoices);
 
 	await db.insert(invoices).values([
 		{

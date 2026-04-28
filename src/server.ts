@@ -11,6 +11,7 @@ import { registerDatabase } from "./plugins/database.js";
 import { registerRequestContext } from "./plugins/request-context.js";
 import { registerSwagger } from "./plugins/swagger.js";
 import { registerCardRoutes } from "./routes/card.routes.js";
+import { registerDashboardRoutes } from "./routes/dashboard.routes.js";
 import { registerHealthRoute } from "./routes/health.js";
 import { registerInvoiceRoutes } from "./routes/invoice.routes.js";
 import { registerTransactionRoutes } from "./routes/transaction.routes.js";
@@ -40,6 +41,7 @@ export const createApp = async ({ db }: CreateAppOptions) => {
 		await registerInvoiceRoutes(protectedRoutes);
 		await registerCardRoutes(protectedRoutes);
 		await registerTransactionRoutes(protectedRoutes);
+		await registerDashboardRoutes(protectedRoutes);
 	});
 
 	return app;

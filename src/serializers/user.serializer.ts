@@ -4,10 +4,10 @@ import type { users } from "../lib/db/schema/users.js";
 type UserRow = typeof users.$inferSelect;
 
 export const userResponseSchema = z.object({
-	id: z.string().uuid(),
+	id: z.uuid(),
 	companyName: z.string(),
-	email: z.string().email(),
-	createdAt: z.string().datetime(),
+	email: z.email(),
+	createdAt: z.iso.datetime(),
 });
 
 export const toUserResponse = (user: UserRow) => ({

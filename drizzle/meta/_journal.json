@@ -15,6 +15,13 @@
       "when": 1777363213252,
       "tag": "0001_slippery_starbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777364764151,
+      "tag": "0002_natural_warstar",
+      "breakpoints": true
     }
   ]
 }

@@ -10,6 +10,7 @@ import { registerAuth } from "./plugins/auth.js";
 import { registerDatabase } from "./plugins/database.js";
 import { registerRequestContext } from "./plugins/request-context.js";
 import { registerSwagger } from "./plugins/swagger.js";
+import { registerCardRoutes } from "./routes/card.routes.js";
 import { registerHealthRoute } from "./routes/health.js";
 import { registerInvoiceRoutes } from "./routes/invoice.routes.js";
 import { registerUserRoutes } from "./routes/user.routes.js";
@@ -36,6 +37,7 @@ export const createApp = async ({ db }: CreateAppOptions) => {
 		await registerAuth(protectedRoutes);
 		await registerUserRoutes(protectedRoutes);
 		await registerInvoiceRoutes(protectedRoutes);
+		await registerCardRoutes(protectedRoutes);
 	});
 
 	return app;

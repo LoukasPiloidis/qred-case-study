@@ -1,0 +1,124 @@
+import { describe, expect, it } from "vitest";
+import { cards } from "../lib/db/schema/cards.js";
+import { users } from "../lib/db/schema/users.js";
+import { useTestDb } from "../test/setup.js";
+import { activateCard, getCardByUserId } from "./card.service.js";
+
+describe("getCardByUserId", () => {
+	const getDb = useTestDb();
+
+	const insertUser = async () => {
+		const [user] = await getDb()
+			.insert(users)
+			.values({ companyName: "Company AB", email: "info@company-ab.se" })
+			.returning();
+		return user;
+	};
+
+	const insertCard = async (userId: string, overrides = {}) => {
+		const [card] = await getDb()
+			.insert(cards)
+			.values({
+				userId,
+				lastFourDigits: "1234",
+				spendingLimit: 1000000,
+				currentSpend: 540000,
+				expiryDate: new Date("2027-12-31"),
+				...overrides,
+			})
+			.returning();
+		return card;
+	};
+
+	it("returns the card for a user", async () => {
+		const user = await insertUser();
+		await insertCard(user.id);
+
+		const card = await getCardByUserId(getDb(), user.id);
+
+		expect(card.lastFourDigits).toBe("1234");
+		expect(card.spendingLimit).toBe(1000000);
+	});
+
+	it("throws NOT_FOUND when user has no card", async () => {
+		const fakeId = "550e8400-e29b-41d4-a716-446655440000";
+
+		await expect(getCardByUserId(getDb(), fakeId)).rejects.toMatchObject({
+			errorCode: 1001,
+		});
+	});
+});
+
+describe("activateCard", () => {
+	const getDb = useTestDb();
+
+	const insertUser = async () => {
+		const [user] = await getDb()
+			.insert(users)
+			.values({ companyName: "Company AB", email: "info@company-ab.se" })
+			.returning();
+		return user;
+	};
+
+	const insertCard = async (userId: string, overrides = {}) => {
+		const [card] = await getDb()
+			.insert(cards)
+			.values({
+				userId,
+				lastFourDigits: "1234",
+				spendingLimit: 1000000,
+				currentSpend: 0,
+				expiryDate: new Date("2027-12-31"),
+				...overrides,
+			})
+			.returning();
+		return card;
+	};
+
+	it("activates an inactive card", async () => {
+		const user = await insertUser();
+		await insertCard(user.id, { status: "inactive" });
+
+		const result = await activateCard(getDb(), user.id);
+
+		expect(result.status).toBe("active");
+	});
+
+	it("throws ALREADY_ACTIVE when card is already active", async () => {
+		const user = await insertUser();
+		await insertCard(user.id, { status: "active" });
+
+		await expect(activateCard(getDb(), user.id)).rejects.toMatchObject({
+			errorCode: 1002,
+		});
+	});
+
+	it("throws BLOCKED when card is blocked", async () => {
+		const user = await insertUser();
+		await insertCard(user.id, { status: "blocked" });
+
+		await expect(activateCard(getDb(), user.id)).rejects.toMatchObject({
+			errorCode: 1004,
+		});
+	});
+
+	it("throws EXPIRED when card has expired", async () => {
+		const user = await insertUser();
+		await insertCard(user.id, {
+			status: "inactive",
+			expiryDate: new Date("2020-01-01"),
+		});
+
+		await expect(activateCard(getDb(), user.id)).rejects.toMatchObject({
+			errorCode: 1003,
+		});
+	});
+
+	it("throws NOT_FOUND when user has no card", async () => {
+		const fakeId = "550e8400-e29b-41d4-a716-446655440000";
+
+		await expect(activateCard(getDb(), fakeId)).rejects.toMatchObject({
+			errorCode: 1001,
+		});
+	});
+});

@@ -1,5 +1,5 @@
 import { db } from "./client.js";
-import { invoices, users } from "./schema/index.js";
+import { cards, invoices, users } from "./schema/index.js";
 
 const USER_ID = "00000000-0000-0000-0000-000000000001";
 
@@ -37,7 +37,19 @@ async function seed() {
 		])
 		.onConflictDoNothing();
 
-	console.log(`Seeded user ${USER_ID} with 3 invoices`);
+	await db
+		.insert(cards)
+		.values({
+			userId: USER_ID,
+			lastFourDigits: "4567",
+			status: "active",
+			spendingLimit: 1000000,
+			currentSpend: 540000,
+			expiryDate: new Date("2027-12-31"),
+		})
+		.onConflictDoNothing();
+
+	console.log(`Seeded user ${USER_ID} with 3 invoices and 1 card`);
 	process.exit(0);
 }
 

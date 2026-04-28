@@ -7,6 +7,7 @@ import type { Database } from "./lib/db/client.js";
 import { errorHandler } from "./lib/errors/error-handler.js";
 import { loggerConfig } from "./lib/logger/index.js";
 import { registerAuth } from "./plugins/auth.js";
+import { registerCors } from "./plugins/cors.js";
 import { registerDatabase } from "./plugins/database.js";
 import { registerRequestContext } from "./plugins/request-context.js";
 import { registerSwagger } from "./plugins/swagger.js";
@@ -30,6 +31,7 @@ export const createApp = async ({ db }: CreateAppOptions) => {
 	app.setSerializerCompiler(serializerCompiler);
 	app.setErrorHandler(errorHandler);
 
+	await registerCors(app);
 	await registerDatabase(app, db);
 	await registerSwagger(app);
 	await registerRequestContext(app);

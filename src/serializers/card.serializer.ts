@@ -25,7 +25,7 @@ export const cardResponseSchema = z.object({
 });
 
 export const toCardResponse = (card: CardRow) => {
-	const remaining = card.spendingLimit - card.currentSpend;
+	const remaining = Math.max(0, card.spendingLimit - card.currentSpend);
 	return {
 		id: card.id,
 		lastFourDigits: card.lastFourDigits,

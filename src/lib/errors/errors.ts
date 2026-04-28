@@ -25,4 +25,5 @@ export const CardErrors = Object.freeze({
 		new AppError(409, "Card is already active", 1002),
 	),
 	EXPIRED: Object.freeze(new AppError(400, "Card has expired", 1003)),
+	BLOCKED: Object.freeze(new AppError(403, "Card is blocked", 1004)),
 });

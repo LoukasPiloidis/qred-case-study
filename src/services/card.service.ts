@@ -20,6 +20,10 @@ export const activateCard = async (db: Database, userId: string) => {
 		throw CardErrors.ALREADY_ACTIVE;
 	}
 
+	if (card.status === "blocked") {
+		throw CardErrors.BLOCKED;
+	}
+
 	if (card.expiryDate <= new Date()) {
 		throw CardErrors.EXPIRED;
 	}

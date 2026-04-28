@@ -34,6 +34,7 @@ export const registerCardRoutes = async (app: FastifyInstance) => {
 					200: cardResponseSchema,
 					400: errorResponseSchema(CardErrors.EXPIRED),
 					401: errorResponseSchema(UserErrors.UNAUTHORIZED),
+					403: errorResponseSchema(CardErrors.BLOCKED),
 					404: errorResponseSchema(CardErrors.NOT_FOUND),
 					409: errorResponseSchema(CardErrors.ALREADY_ACTIVE),
 				},

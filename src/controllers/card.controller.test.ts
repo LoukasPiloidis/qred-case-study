@@ -137,6 +137,35 @@ describe("PATCH /api/self/card/activate", () => {
 		await app.close();
 	});
 
+	it("returns 403 when card is blocked", async () => {
+		const db = getDb();
+		const [user] = await db
+			.insert(users)
+			.values({ companyName: "Company AB", email: "info@company-ab.se" })
+			.returning();
+
+		await db.insert(cards).values({
+			userId: user.id,
+			lastFourDigits: "4567",
+			spendingLimit: 1000000,
+			currentSpend: 0,
+			expiryDate: new Date("2027-12-31"),
+			status: "blocked",
+		});
+
+		const app = await createTestApp(db);
+		const response = await app.inject({
+			method: "PATCH",
+			url: "/api/self/card/activate",
+			headers: { "x-user-id": user.id },
+		});
+
+		expect(response.statusCode).toBe(403);
+		expect(response.json().errorCode).toBe(1004);
+
+		await app.close();
+	});
+
 	it("returns 400 when card has expired", async () => {
 		const db = getDb();
 		const [user] = await db

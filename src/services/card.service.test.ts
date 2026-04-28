@@ -93,6 +93,15 @@ describe("activateCard", () => {
 		});
 	});
 
+	it("throws BLOCKED when card is blocked", async () => {
+		const user = await insertUser();
+		await insertCard(user.id, { status: "blocked" });
+
+		await expect(activateCard(getDb(), user.id)).rejects.toMatchObject({
+			errorCode: 1004,
+		});
+	});
+
 	it("throws EXPIRED when card has expired", async () => {
 		const user = await insertUser();
 		await insertCard(user.id, {

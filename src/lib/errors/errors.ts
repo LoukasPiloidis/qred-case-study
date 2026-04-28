@@ -27,3 +27,7 @@ export const CardErrors = Object.freeze({
 	EXPIRED: Object.freeze(new AppError(400, "Card has expired", 1003)),
 	BLOCKED: Object.freeze(new AppError(403, "Card is blocked", 1004)),
 });
+
+export const TransactionErrors = Object.freeze({
+	NOT_FOUND: Object.freeze(new AppError(404, "No transactions found", 2001)),
+});

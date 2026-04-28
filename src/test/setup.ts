@@ -17,6 +17,7 @@ export const useTestDb = () => {
 	});
 
 	afterEach(async () => {
+		await db.delete(schema.transactions);
 		await db.delete(schema.cards);
 		await db.delete(schema.invoices);
 		await db.delete(schema.users);

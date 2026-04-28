@@ -13,6 +13,7 @@ import { registerSwagger } from "./plugins/swagger.js";
 import { registerCardRoutes } from "./routes/card.routes.js";
 import { registerHealthRoute } from "./routes/health.js";
 import { registerInvoiceRoutes } from "./routes/invoice.routes.js";
+import { registerTransactionRoutes } from "./routes/transaction.routes.js";
 import { registerUserRoutes } from "./routes/user.routes.js";
 
 type CreateAppOptions = {
@@ -38,6 +39,7 @@ export const createApp = async ({ db }: CreateAppOptions) => {
 		await registerUserRoutes(protectedRoutes);
 		await registerInvoiceRoutes(protectedRoutes);
 		await registerCardRoutes(protectedRoutes);
+		await registerTransactionRoutes(protectedRoutes);
 	});
 
 	return app;

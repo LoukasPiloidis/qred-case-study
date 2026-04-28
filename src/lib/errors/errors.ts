@@ -27,3 +27,7 @@ export const CardErrors = Object.freeze({
 	EXPIRED: Object.freeze(new AppError(400, "Card has expired", 1003)),
 	BLOCKED: Object.freeze(new AppError(403, "Card is blocked", 1004)),
 });
+
+export const CursorErrors = Object.freeze({
+	INVALID_CURSOR: Object.freeze(new AppError(400, "Invalid cursor", 2001)),
+});

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { cards } from "../lib/db/schema/cards.js";
-import { transactions } from "../lib/db/schema/transactions.js";
-import { users } from "../lib/db/schema/users.js";
+import {
+	createCard,
+	createTransaction,
+	createUser,
+} from "../test/factories.js";
 import { createTestApp } from "../test/helpers.js";
 import { useTestDb } from "../test/setup.js";
 
@@ -10,39 +12,26 @@ describe("GET /api/self/card/transactions", () => {
 
 	it("returns 200 with paginated transaction data", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
+		const user = await createUser(db);
+		const card = await createCard(db, { userId: user.id });
 
-		const [card] = await db
-			.insert(cards)
-			.values({
-				userId: user.id,
-				lastFourDigits: "4567",
-				spendingLimit: 1000000,
-				currentSpend: 0,
-				expiryDate: new Date("2027-12-31"),
-			})
-			.returning();
-
-		await db.insert(transactions).values([
-			{
+		await Promise.all([
+			createTransaction(db, {
 				userId: user.id,
 				cardId: card.id,
 				description: "Office Supplies AB",
 				amount: 15000,
 				category: "supplies",
 				date: new Date("2026-04-25T10:30:00Z"),
-			},
-			{
+			}),
+			createTransaction(db, {
 				userId: user.id,
 				cardId: card.id,
 				description: "Cloud Services Inc",
 				amount: 25000,
 				category: "software",
 				date: new Date("2026-04-20T14:00:00Z"),
-			},
+			}),
 		]);
 
 		const app = await createTestApp(db);
@@ -72,10 +61,7 @@ describe("GET /api/self/card/transactions", () => {
 
 	it("returns 200 with empty array when user has no transactions", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
+		const user = await createUser(db);
 
 		const app = await createTestApp(db);
 		const response = await app.inject({
@@ -96,47 +82,34 @@ describe("GET /api/self/card/transactions", () => {
 
 	it("paginates with limit and cursor", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
+		const user = await createUser(db);
+		const card = await createCard(db, { userId: user.id });
 
-		const [card] = await db
-			.insert(cards)
-			.values({
-				userId: user.id,
-				lastFourDigits: "4567",
-				spendingLimit: 1000000,
-				currentSpend: 0,
-				expiryDate: new Date("2027-12-31"),
-			})
-			.returning();
-
-		await db.insert(transactions).values([
-			{
+		await Promise.all([
+			createTransaction(db, {
 				userId: user.id,
 				cardId: card.id,
 				description: "Item A",
 				amount: 10000,
 				category: "misc",
 				date: new Date("2026-04-25T10:00:00Z"),
-			},
-			{
+			}),
+			createTransaction(db, {
 				userId: user.id,
 				cardId: card.id,
 				description: "Item B",
 				amount: 20000,
 				category: "misc",
 				date: new Date("2026-04-24T10:00:00Z"),
-			},
-			{
+			}),
+			createTransaction(db, {
 				userId: user.id,
 				cardId: card.id,
 				description: "Item C",
 				amount: 30000,
 				category: "misc",
 				date: new Date("2026-04-23T10:00:00Z"),
-			},
+			}),
 		]);
 
 		const app = await createTestApp(db);
@@ -169,10 +142,7 @@ describe("GET /api/self/card/transactions", () => {
 
 	it("returns 400 for invalid cursor", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
+		const user = await createUser(db);
 
 		const app = await createTestApp(db);
 		const response = await app.inject({

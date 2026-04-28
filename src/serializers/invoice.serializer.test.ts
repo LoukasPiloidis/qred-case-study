@@ -1,21 +1,17 @@
 import { describe, expect, it } from "vitest";
+import { makeInvoice } from "../test/factories.js";
 import { toInvoiceResponse, toInvoicesResponse } from "./invoice.serializer.js";
 
 describe("toInvoiceResponse", () => {
 	it("transforms an invoice row to the API response shape", () => {
-		const invoiceRow = {
-			id: "550e8400-e29b-41d4-a716-446655440000",
-			userId: "660e8400-e29b-41d4-a716-446655440000",
-			amount: 150000,
+		const invoiceRow = makeInvoice({
 			dueDate: new Date("2025-03-15T00:00:00.000Z"),
-			status: "pending" as const,
-			createdAt: new Date("2025-01-01T00:00:00.000Z"),
-		};
+		});
 
 		const result = toInvoiceResponse(invoiceRow);
 
 		expect(result).toEqual({
-			id: "550e8400-e29b-41d4-a716-446655440000",
+			id: "770e8400-e29b-41d4-a716-446655440000",
 			amount: 150000,
 			dueDate: "2025-03-15T00:00:00.000Z",
 			status: "pending",
@@ -28,22 +24,21 @@ describe("toInvoicesResponse", () => {
 	it("includes hasDueInvoice and dueInvoiceCount alongside invoices", () => {
 		const data = {
 			invoices: [
-				{
+				makeInvoice({
 					id: "aaa",
 					userId: "bbb",
 					amount: 50000,
 					dueDate: new Date("2025-02-01T00:00:00.000Z"),
 					status: "paid" as const,
-					createdAt: new Date("2025-01-01T00:00:00.000Z"),
-				},
-				{
+				}),
+				makeInvoice({
 					id: "ccc",
 					userId: "bbb",
 					amount: 75000,
 					dueDate: new Date("2025-03-01T00:00:00.000Z"),
 					status: "overdue" as const,
 					createdAt: new Date("2025-01-15T00:00:00.000Z"),
-				},
+				}),
 			],
 			hasDueInvoice: true,
 			dueInvoiceCount: 1,

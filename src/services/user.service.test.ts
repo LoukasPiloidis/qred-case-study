@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { users } from "../lib/db/schema/index.js";
+import { createUser } from "../test/factories.js";
 import { useTestDb } from "../test/setup.js";
 import { getUserById } from "./user.service.js";
 
@@ -7,20 +7,12 @@ describe("getUserById", () => {
 	const getDb = useTestDb();
 
 	it("returns the user when found", async () => {
-		const db = getDb();
-		const [inserted] = await db
-			.insert(users)
-			.values({
-				companyName: "Company AB",
-				email: "info@company-ab.se",
-			})
-			.returning();
+		const user = await createUser(getDb());
 
-		const result = await getUserById(db, inserted.id);
+		const result = await getUserById(getDb(), user.id);
 
-		expect(result.id).toBe(inserted.id);
+		expect(result.id).toBe(user.id);
 		expect(result.companyName).toBe("Company AB");
-		expect(result.email).toBe("info@company-ab.se");
 	});
 
 	it("throws AppError 404 when user is not found", async () => {

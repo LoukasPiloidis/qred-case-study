@@ -1,38 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { cards } from "../lib/db/schema/cards.js";
-import { users } from "../lib/db/schema/users.js";
+import { createCard, createUser } from "../test/factories.js";
 import { useTestDb } from "../test/setup.js";
 import { activateCard, getCardByUserId } from "./card.service.js";
 
 describe("getCardByUserId", () => {
 	const getDb = useTestDb();
 
-	const insertUser = async () => {
-		const [user] = await getDb()
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
-		return user;
-	};
-
-	const insertCard = async (userId: string, overrides = {}) => {
-		const [card] = await getDb()
-			.insert(cards)
-			.values({
-				userId,
-				lastFourDigits: "1234",
-				spendingLimit: 1000000,
-				currentSpend: 540000,
-				expiryDate: new Date("2027-12-31"),
-				...overrides,
-			})
-			.returning();
-		return card;
-	};
-
 	it("returns the card for a user", async () => {
-		const user = await insertUser();
-		await insertCard(user.id);
+		const user = await createUser(getDb());
+		await createCard(getDb(), { userId: user.id });
 
 		const card = await getCardByUserId(getDb(), user.id);
 
@@ -52,32 +28,9 @@ describe("getCardByUserId", () => {
 describe("activateCard", () => {
 	const getDb = useTestDb();
 
-	const insertUser = async () => {
-		const [user] = await getDb()
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
-		return user;
-	};
-
-	const insertCard = async (userId: string, overrides = {}) => {
-		const [card] = await getDb()
-			.insert(cards)
-			.values({
-				userId,
-				lastFourDigits: "1234",
-				spendingLimit: 1000000,
-				currentSpend: 0,
-				expiryDate: new Date("2027-12-31"),
-				...overrides,
-			})
-			.returning();
-		return card;
-	};
-
 	it("activates an inactive card", async () => {
-		const user = await insertUser();
-		await insertCard(user.id, { status: "inactive" });
+		const user = await createUser(getDb());
+		await createCard(getDb(), { userId: user.id, status: "inactive" });
 
 		const result = await activateCard(getDb(), user.id);
 
@@ -85,8 +38,8 @@ describe("activateCard", () => {
 	});
 
 	it("throws ALREADY_ACTIVE when card is already active", async () => {
-		const user = await insertUser();
-		await insertCard(user.id, { status: "active" });
+		const user = await createUser(getDb());
+		await createCard(getDb(), { userId: user.id, status: "active" });
 
 		await expect(activateCard(getDb(), user.id)).rejects.toMatchObject({
 			errorCode: 1002,
@@ -94,8 +47,8 @@ describe("activateCard", () => {
 	});
 
 	it("throws BLOCKED when card is blocked", async () => {
-		const user = await insertUser();
-		await insertCard(user.id, { status: "blocked" });
+		const user = await createUser(getDb());
+		await createCard(getDb(), { userId: user.id, status: "blocked" });
 
 		await expect(activateCard(getDb(), user.id)).rejects.toMatchObject({
 			errorCode: 1004,
@@ -103,8 +56,9 @@ describe("activateCard", () => {
 	});
 
 	it("throws EXPIRED when card has expired", async () => {
-		const user = await insertUser();
-		await insertCard(user.id, {
+		const user = await createUser(getDb());
+		await createCard(getDb(), {
+			userId: user.id,
 			status: "inactive",
 			expiryDate: new Date("2020-01-01"),
 		});

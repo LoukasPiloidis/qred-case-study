@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     container_name: qred-postgres
     ports:
       - "5432:5432"
@@ -9,7 +9,7 @@ services:
       POSTGRES_USER: qred
       POSTGRES_PASSWORD: qred
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
 
 volumes:
   pgdata:

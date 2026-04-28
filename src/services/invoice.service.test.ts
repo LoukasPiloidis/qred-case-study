@@ -1,30 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { invoices } from "../lib/db/schema/invoices.js";
-import { users } from "../lib/db/schema/users.js";
+import { createInvoice, createUser } from "../test/factories.js";
 import { useTestDb } from "../test/setup.js";
 import { getInvoicesByUserId } from "./invoice.service.js";
 
 describe("getInvoicesByUserId", () => {
 	const getDb = useTestDb();
 
-	const insertUser = async () => {
-		const [user] = await getDb()
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
-		return user;
-	};
-
 	it("returns invoices for a user", async () => {
-		const user = await insertUser();
-		await getDb()
-			.insert(invoices)
-			.values({
-				userId: user.id,
-				amount: 100000,
-				dueDate: new Date("2025-06-01"),
-				status: "pending",
-			});
+		const user = await createUser(getDb());
+		await createInvoice(getDb(), {
+			userId: user.id,
+			amount: 100000,
+			dueDate: new Date("2025-06-01"),
+		});
 
 		const result = await getInvoicesByUserId(getDb(), user.id);
 
@@ -33,7 +21,7 @@ describe("getInvoicesByUserId", () => {
 	});
 
 	it("returns empty array when user has no invoices", async () => {
-		const user = await insertUser();
+		const user = await createUser(getDb());
 
 		const result = await getInvoicesByUserId(getDb(), user.id);
 
@@ -43,31 +31,29 @@ describe("getInvoicesByUserId", () => {
 	});
 
 	it("detects due invoices correctly", async () => {
-		const user = await insertUser();
+		const user = await createUser(getDb());
 		const pastDate = new Date("2024-01-01");
 
-		await getDb()
-			.insert(invoices)
-			.values([
-				{
-					userId: user.id,
-					amount: 50000,
-					dueDate: pastDate,
-					status: "pending",
-				},
-				{
-					userId: user.id,
-					amount: 75000,
-					dueDate: pastDate,
-					status: "overdue",
-				},
-				{
-					userId: user.id,
-					amount: 30000,
-					dueDate: pastDate,
-					status: "paid",
-				},
-			]);
+		await Promise.all([
+			createInvoice(getDb(), {
+				userId: user.id,
+				amount: 50000,
+				dueDate: pastDate,
+				status: "pending",
+			}),
+			createInvoice(getDb(), {
+				userId: user.id,
+				amount: 75000,
+				dueDate: pastDate,
+				status: "overdue",
+			}),
+			createInvoice(getDb(), {
+				userId: user.id,
+				amount: 30000,
+				dueDate: pastDate,
+				status: "paid",
+			}),
+		]);
 
 		const result = await getInvoicesByUserId(getDb(), user.id);
 

@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { invoices } from "../lib/db/schema/invoices.js";
-import { users } from "../lib/db/schema/users.js";
+import { createInvoice, createUser } from "../test/factories.js";
 import { createTestApp } from "../test/helpers.js";
 import { useTestDb } from "../test/setup.js";
 
@@ -9,16 +8,11 @@ describe("GET /api/self/invoices", () => {
 
 	it("returns 200 with invoices data", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
-
-		await db.insert(invoices).values({
+		const user = await createUser(db);
+		await createInvoice(db, {
 			userId: user.id,
 			amount: 100000,
 			dueDate: new Date("2025-06-01"),
-			status: "pending",
 		});
 
 		const app = await createTestApp(db);
@@ -41,10 +35,7 @@ describe("GET /api/self/invoices", () => {
 
 	it("returns 200 with empty invoices when user has none", async () => {
 		const db = getDb();
-		const [user] = await db
-			.insert(users)
-			.values({ companyName: "Company AB", email: "info@company-ab.se" })
-			.returning();
+		const user = await createUser(db);
 
 		const app = await createTestApp(db);
 		const response = await app.inject({

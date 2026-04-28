@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { users } from "../lib/db/schema/index.js";
+import { createUser } from "../test/factories.js";
 import { createTestApp } from "../test/helpers.js";
 import { useTestDb } from "../test/setup.js";
 
@@ -8,27 +8,20 @@ describe("GET /api/self", () => {
 
 	it("returns 200 with the user data", async () => {
 		const db = getDb();
-		const [inserted] = await db
-			.insert(users)
-			.values({
-				companyName: "Company AB",
-				email: "info@company-ab.se",
-			})
-			.returning();
+		const user = await createUser(db);
 
 		const app = await createTestApp(db);
 		const response = await app.inject({
 			method: "GET",
 			url: "/api/self",
-			headers: { "x-user-id": inserted.id },
+			headers: { "x-user-id": user.id },
 		});
 
 		expect(response.statusCode).toBe(200);
 
 		const body = response.json();
-		expect(body.id).toBe(inserted.id);
+		expect(body.id).toBe(user.id);
 		expect(body.companyName).toBe("Company AB");
-		expect(body.email).toBe("info@company-ab.se");
 		expect(body.createdAt).toBeDefined();
 
 		await app.close();

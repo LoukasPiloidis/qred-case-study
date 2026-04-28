@@ -1,29 +1,17 @@
 import { describe, expect, it } from "vitest";
+import { makeTransaction } from "../test/factories.js";
 import {
 	toTransactionResponse,
 	toTransactionsResponse,
 } from "./transaction.serializer.js";
-
-const makeTransaction = (overrides = {}) => ({
-	id: "550e8400-e29b-41d4-a716-446655440000",
-	userId: "660e8400-e29b-41d4-a716-446655440000",
-	cardId: "770e8400-e29b-41d4-a716-446655440000",
-	description: "Office Supplies AB",
-	amount: 15000,
-	currency: "SEK",
-	date: new Date("2026-04-25T10:30:00.000Z"),
-	category: "supplies",
-	createdAt: new Date("2026-04-25T10:30:00.000Z"),
-	...overrides,
-});
 
 describe("toTransactionResponse", () => {
 	it("transforms a transaction row to the API response shape", () => {
 		const result = toTransactionResponse(makeTransaction());
 
 		expect(result).toEqual({
-			id: "550e8400-e29b-41d4-a716-446655440000",
-			cardId: "770e8400-e29b-41d4-a716-446655440000",
+			id: "880e8400-e29b-41d4-a716-446655440000",
+			cardId: "660e8400-e29b-41d4-a716-446655440000",
 			description: "Office Supplies AB",
 			amount: 15000,
 			formattedAmount: "150 kr",

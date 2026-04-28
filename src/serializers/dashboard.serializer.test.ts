@@ -1,52 +1,27 @@
 import { describe, expect, it } from "vitest";
+import {
+	makeCard,
+	makeInvoice,
+	makeTransaction,
+	makeUser,
+} from "../test/factories.js";
 import { toDashboardResponse } from "./dashboard.serializer.js";
 
-const makeUser = () => ({
-	id: "550e8400-e29b-41d4-a716-446655440000",
-	companyName: "Company AB",
-	email: "info@company-ab.se",
-	createdAt: new Date("2025-01-01T00:00:00.000Z"),
-});
-
-const makeCard = () => ({
-	id: "660e8400-e29b-41d4-a716-446655440000",
-	userId: "550e8400-e29b-41d4-a716-446655440000",
-	lastFourDigits: "4567",
-	status: "active" as const,
-	spendingLimit: 1000000,
-	currentSpend: 540000,
-	expiryDate: new Date("2027-12-31T00:00:00.000Z"),
-	createdAt: new Date("2025-01-01T00:00:00.000Z"),
-});
-
 const makeInvoiceData = () => ({
-	invoices: [
-		{
-			id: "770e8400-e29b-41d4-a716-446655440000",
-			userId: "550e8400-e29b-41d4-a716-446655440000",
-			amount: 150000,
-			dueDate: new Date("2025-06-01T00:00:00.000Z"),
-			status: "pending" as const,
-			createdAt: new Date("2025-01-01T00:00:00.000Z"),
-		},
-	],
+	invoices: [makeInvoice()],
 	hasDueInvoice: true,
 	dueInvoiceCount: 1,
 });
 
 const makeTransactionData = () => ({
 	rows: [
-		{
-			id: "880e8400-e29b-41d4-a716-446655440000",
-			userId: "550e8400-e29b-41d4-a716-446655440000",
-			cardId: "660e8400-e29b-41d4-a716-446655440000",
+		makeTransaction({
 			description: "Coffee shop",
 			amount: -4500,
-			currency: "SEK",
-			date: new Date("2025-06-10T00:00:00.000Z"),
 			category: "food",
+			date: new Date("2025-06-10T00:00:00.000Z"),
 			createdAt: new Date("2025-06-10T00:00:00.000Z"),
-		},
+		}),
 	],
 	remainingCount: 54,
 });

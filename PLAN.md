@@ -55,7 +55,7 @@ src/
 
 **Commit**: `feat: add users and invoices with schema, services, and tests`
 
-**Endpoints**: `GET /api/users/:userId`, `GET /api/users/:userId/invoices`
+**Endpoints**: `GET /api/self`, `GET /api/self/invoices`
 
 **Schema**:
 - `users`: id (uuid), companyName, email, createdAt
@@ -74,10 +74,13 @@ src/modules/invoices/
 ```
 
 **Key details**:
+- Auth via `x-user-id` header (simulates JWT/cookie) — userId derived from auth context, not URL params
+- Protected routes scoped under a Fastify register block with auth hook
 - Invoice service computes `hasDueInvoice` (for FE notification badge)
-- Zod params validation: `{ userId: z.string().uuid() }`
 - `fastify-type-provider-zod` for auto OpenAPI generation
-- Error codes: USER_NOT_FOUND=3001, INVOICES_NOT_FOUND=4001
+- Error classes group domain errors as static instances (e.g. `UserErrors.NOT_FOUND`)
+- Shared `useTestDb()` helper handles all test lifecycle (beforeAll/afterEach/afterAll)
+- Error codes: USER_NOT_FOUND=3001, INVOICES_USER_NOT_FOUND=4001
 
 ---
 
@@ -85,7 +88,7 @@ src/modules/invoices/
 
 **Commit**: `feat: add cards endpoints with spending limit tracking`
 
-**Endpoints**: `GET /api/cards/:cardId`, `PATCH /api/cards/:cardId/activate`
+**Endpoints**: `GET /api/self/card`, `PATCH /api/self/card/activate`
 
 **Schema**:
 - `cards`: id (uuid), userId (FK), lastFourDigits (varchar 4), status (enum: inactive/active/blocked), spendingLimit (integer/oere), currentSpend (integer/oere), expiryDate, createdAt
@@ -102,7 +105,7 @@ src/modules/invoices/
 
 **Commit**: `feat: add paginated transactions endpoint`
 
-**Endpoint**: `GET /api/cards/:cardId/transactions?limit=3&cursor=xxx`
+**Endpoint**: `GET /api/self/card/transactions?limit=3&cursor=xxx`
 
 **Schema**:
 - `transactions`: id (uuid), cardId (FK), description, amount (integer/oere), currency (default SEK), date, category, createdAt
@@ -120,7 +123,7 @@ src/modules/invoices/
 
 **Commit**: `feat: add dashboard aggregate endpoint for home screen`
 
-**Endpoint**: `GET /api/users/:userId/dashboard`
+**Endpoint**: `GET /api/self/dashboard`
 
 **Response** (maps 1:1 to FE mockup):
 ```json

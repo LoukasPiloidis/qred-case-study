@@ -1,1 +1,2 @@
-// Schema barrel file — tables will be added in subsequent phases
+export { invoiceStatusEnum, invoices } from "./invoices.js";
+export { users } from "./users.js";

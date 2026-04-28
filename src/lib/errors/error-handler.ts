@@ -1,5 +1,6 @@
 import type { FastifyError, FastifyReply, FastifyRequest } from "fastify";
-import { AppError } from "./app-error.js";
+import { hasZodFastifySchemaValidationErrors } from "fastify-type-provider-zod";
+import { AppError } from "./errors.js";
 
 export const errorHandler = (
 	error: FastifyError,
@@ -17,6 +18,18 @@ export const errorHandler = (
 			error: error.name,
 			message: error.message,
 			errorCode: error.errorCode,
+		});
+	}
+
+	if (hasZodFastifySchemaValidationErrors(error)) {
+		request.log.warn({ validation: error.validation }, "Validation error");
+
+		return reply.status(400).send({
+			statusCode: 400,
+			error: "VALIDATION_ERROR",
+			message: error.message,
+			errorCode: 9000,
+			details: error.validation,
 		});
 	}
 

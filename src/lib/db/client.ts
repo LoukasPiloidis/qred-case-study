@@ -1,3 +1,4 @@
+import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { env } from "../../config/env.js";
@@ -7,4 +8,4 @@ const connection = postgres(env.DATABASE_URL);
 
 export const db = drizzle(connection, { schema });
 
-export type Database = typeof db;
+export type Database = PgDatabase<PgQueryResultHKT, typeof schema>;

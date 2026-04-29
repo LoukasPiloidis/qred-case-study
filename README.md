@@ -16,14 +16,14 @@ The API powers a mobile dashboard that displays company info, invoice notificati
 
 ## Quick Start
 
-**Prerequisites**: Node.js 22+, Docker
+**Prerequisites**: Node.js 25+, pnpm, Docker
 
 ```bash
-npm install
-npm run db:start       # Start PostgreSQL via Docker Compose
-npm run db:migrate     # Run Drizzle migrations
-npm run db:seed        # Seed demo data (1 user, 1 card, 57 transactions, 3 invoices)
-npm run dev            # Start dev server with hot reload
+pnpm install
+pnpm run db:start       # Start PostgreSQL via Docker Compose
+pnpm run db:migrate     # Run Drizzle migrations
+pnpm run db:seed        # Seed demo data (1 user, 1 card, 57 transactions, 3 invoices)
+pnpm run dev            # Start dev server with hot reload
 ```
 
 Interactive API docs are available at [http://localhost:3000/reference](http://localhost:3000/reference) (Scalar).
@@ -75,6 +75,8 @@ src/
     auth.ts                         # x-user-id header auth hook
     database.ts                     # DB plugin (Fastify DI)
     request-context.ts              # Request UUID + Pino child logger
+    cors.ts                         # CORS configuration
+    rate-limit.ts                   # Rate limiting
     swagger.ts                      # @fastify/swagger + Scalar
   lib/
     db/client.ts                    # drizzle(postgres(...))
@@ -92,6 +94,7 @@ src/
   test/
     setup.ts                        # PGlite test DB lifecycle (useTestDb)
     helpers.ts                      # createTestApp() factory
+    factories.ts                    # Test data factories (users, cards, invoices, transactions)
 ```
 
 ### Dependency Injection
@@ -131,18 +134,18 @@ src/
 
 | Script          | Description                                      |
 | --------------- | ------------------------------------------------ |
-| `npm run dev`   | Start dev server with hot reload (`tsx watch`)   |
-| `npm run build` | Compile TypeScript                               |
-| `npm start`     | Run compiled output (`node dist/index.js`)       |
-| `npm run db:start` | Start PostgreSQL via Docker Compose           |
-| `npm run db:stop`  | Stop PostgreSQL container                      |
-| `npm run db:generate` | Generate Drizzle migrations                 |
-| `npm run db:migrate`  | Run pending migrations                       |
-| `npm run db:seed`     | Seed the database with demo data             |
-| `npm test`            | Run all tests                                |
-| `npm run test:watch`  | Run tests in watch mode                      |
-| `npm run lint`        | Type-check + Biome lint                      |
-| `npm run lint:fix`    | Auto-fix lint issues                         |
+| `pnpm run dev`   | Start dev server with hot reload (`tsx watch`)   |
+| `pnpm run build` | Compile TypeScript                               |
+| `pnpm start`     | Run compiled output (`node dist/index.js`)       |
+| `pnpm run db:start` | Start PostgreSQL via Docker Compose           |
+| `pnpm run db:stop`  | Stop PostgreSQL container                      |
+| `pnpm run db:generate` | Generate Drizzle migrations                 |
+| `pnpm run db:migrate`  | Run pending migrations                       |
+| `pnpm run db:seed`     | Seed the database with demo data             |
+| `pnpm test`            | Run all tests                                |
+| `pnpm run test:watch`  | Run tests in watch mode                      |
+| `pnpm run lint`        | Type-check + Biome lint                      |
+| `pnpm run lint:fix`    | Auto-fix lint issues                         |
 
 ## Testing
 
@@ -155,8 +158,8 @@ Tests live next to the files they test (e.g., `card.service.ts` and `card.servic
 | **Controller** | Request handling + response shape   | PGlite        |
 
 ```bash
-npm test              # Run all tests once
-npm run test:watch    # Run in watch mode
+pnpm test              # Run all tests once
+pnpm run test:watch    # Run in watch mode
 ```
 
 No Docker is needed to run tests — PGlite runs an in-process Postgres instance using the same Drizzle schema as production.
